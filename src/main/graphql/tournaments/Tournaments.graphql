@@ -1,0 +1,17 @@
+query TournamentsQuery($perPage: Int = 100, $ownerId: ID!) {
+  tournaments(query: { perPage: $perPage, filter: { ownerId: $ownerId } }) {
+    nodes {
+      id
+      name
+      slug
+      startAt
+      endAt
+      city
+      countryCode
+      timezone
+      images {
+        url
+      }
+    }
+  }
+}

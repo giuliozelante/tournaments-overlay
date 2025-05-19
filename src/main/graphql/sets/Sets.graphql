@@ -1,0 +1,29 @@
+query SetsQuery($eventId: ID!, $page: Int, $perPage: Int) {
+  event(id: $eventId) {
+    id
+    name
+    sets(page: $page, perPage: $perPage) {
+      nodes {
+        id
+        fullRoundText
+        round
+        state
+        startAt
+        slots {
+          entrant {
+            id
+            name
+          }
+          standing {
+            placement
+            stats {
+              score {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

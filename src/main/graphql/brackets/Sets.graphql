@@ -1,0 +1,40 @@
+query Sets($phaseGroupId: ID!, $page: Int = 1, $perPage: Int = 25) {
+  phaseGroup(id: $phaseGroupId) {
+    id
+    displayIdentifier
+    sets(page: $page, perPage: $perPage, sortType: STANDARD) {
+      pageInfo {
+        total
+        totalPages
+        page
+        perPage
+      }
+      nodes {
+        id
+        wPlacement
+        fullRoundText
+        round
+        slots {
+          id
+          slotIndex
+          standing {
+            stats {
+              score {
+                value
+              }
+            }
+          }
+          entrant {
+            id
+            name
+            isDisqualified
+            standing {
+              placement
+            }
+            skill
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html 
+    lang="en" 
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout.html}">
+<head>
+    <title>Home</title>
+    <style>
+        .features {
+            margin-top: 2rem;
+        }
+        .tournament-loader {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .tournament-loader h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content">
+        <h2>Welcome to Tournaments Overlay</h2>
+        <p>This application provides access to tournament data from the start.gg API.</p>
+        
+        <div class="tournament-loader">
+            <h3>Quick Tournament Access</h3>
+            <p>Load tournaments for a specific Owner ID using HTMX:</p>
+            
+            <section hx-get="/tournaments?ownerId=1802421" class="smooth" hx-trigger="load" hx-target="this">
+                <div>
+                    <p>Loading tournaments...</p>
+                </div>
+            </section>
+        </div>
+        
+        <div class="features">
+            <h3>Features:</h3>
+            <ul>
+                <li><a href="/tournaments" th:href="@{/tournaments}">Browse Tournaments</a> - View a list of tournaments</li>
+                <li><a href="/events" th:href="@{/events}">View Events</a> - See events within tournaments</li>
+                <li><a href="/standings" th:href="@{/standings}">Check Standings</a> - View standings for events</li>
+                <li><a href="/sets" th:href="@{/sets}">Browse Brackets</a> - View bracket matches and sets</li>
+            </ul>
+        </div>
+    </main>
+</body>
+</html> 

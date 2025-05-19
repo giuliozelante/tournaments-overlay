@@ -1,0 +1,26 @@
+query BracketSetsQuery($eventId: ID!) {
+  event(id: $eventId) {
+    sets {
+      nodes {
+        id
+        fullRoundText
+        round
+        startAt
+        state
+        slots {
+          standing {
+            placement
+            stats {
+              score {
+                value
+              }
+            }
+          }
+          entrant {
+            name
+          }
+        }
+      }
+    }
+  }
+} 

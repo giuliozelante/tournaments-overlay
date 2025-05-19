@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html
+    lang="en" 
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Tournaments Overlay</title>
+    
+    <!-- Water.css for minimal styling -->
+    <link rel="stylesheet" th:href="@{/webjars/water.css/2.1.1/out/dark.css}">
+    
+    <!-- HTMX -->
+    <script type="text/javascript" th:src="@{/webjars/htmx.org/2.0.1/dist/htmx.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/htmx-ext-head-support/2.0.1/head-support.js}"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        nav {
+            margin-bottom: 2rem;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        nav ul li {
+            margin-right: 1rem;
+        }
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+    </style>
+    
+    <!-- Page-specific head content -->
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body hx-ext="head-support">
+    <div class="container">
+        <header>
+            <h1>Tournaments Overlay</h1>
+            <nav>
+                <ul>
+                    <li><a href="/" th:href="@{/}">Home</a></li>
+                    <li><a href="/tournaments" th:href="@{/tournaments}">Tournaments</a></li>
+                    <li><a href="/events" th:href="@{/events}">Events</a></li>
+                    <li><a href="/standings" th:href="@{/standings}">Standings</a></li>
+                    <li><a href="/sets" th:href="@{/sets}">Brackets</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main layout:fragment="content">
+            <!-- Page content will be inserted here -->
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Tournaments Overlay</p>
+        </footer>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,22 @@
+query StandingsQuery($eventId: ID!, $page: Int!, $perPage: Int!) {
+  event(id: $eventId) {
+    standings(query: {
+      page: $page,
+      perPage: $perPage
+    }) {
+      nodes {
+        id
+        placement
+        entrant {
+          name
+        }
+        stats {
+          score {
+            label
+            value
+          }
+        }
+      }
+    }
+  }
+} 

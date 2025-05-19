@@ -1,0 +1,106 @@
+plugins {
+    id("io.micronaut.application") version "4.5.3"
+    id("com.gradleup.shadow") version "8.3.6"
+    id("io.micronaut.aot") version "4.5.3"
+}
+
+version = '0.1'
+group = 'it.tournaments.overlay'
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("it.tournaments.overlay.*")
+    }
+    aot {
+        // Enable the optimized HTTP server
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+        replaceLogbackXml = true
+    }
+}
+
+dependencies {
+    // Micronaut core dependencies
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    
+    // HTTP client
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    
+    // Jackson for JSON processing
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    
+    // HTTP client for Micronaut
+    implementation("io.micronaut:micronaut-http-client")
+    
+    // Thymeleaf with layout dialect
+    implementation("io.micronaut.views:micronaut-views-fieldset")
+    implementation("io.micronaut.views:micronaut-views-thymeleaf")
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0")
+    
+    // Validation
+    implementation("io.micronaut.validation:micronaut-validation")
+
+    // Jakarta annotations
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    
+    // JSON processing and serialization
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+
+    // Logging
+    implementation("ch.qos.logback:logback-classic")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok")
+    
+    // Runtime
+    runtimeOnly("org.yaml:snakeyaml")
+    runtimeOnly("org.webjars.npm:htmx.org:2.0.1")
+    runtimeOnly("org.webjars.npm:htmx-ext-head-support:2.0.1")
+    runtimeOnly("org.webjars.npm:water.css:2.1.1")
+    
+    // Testing
+    testImplementation("io.micronaut:micronaut-http-client")
+}
+
+application {
+    mainClass.set("it.tournaments.overlay.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += "src/main/java"
+        }
+        resources {
+            srcDirs += "src/main/graphql"
+        }
+    }
+}
+
+tasks.named("test") {
+    useJUnitPlatform()
+}
+
+tasks.named("dockerfileNative") {
+    jdkVersion = "21"
+}

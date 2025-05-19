@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <title>Not Found</title>
+</head>
+<body>
+    <main layout:fragment="content">
+        <h2>404 - Page Not Found</h2>
+        <p>The requested path <strong th:text="${path}">path</strong> could not be found.</p>
+        <p><a href="/" th:href="@{/}">Return to home page</a></p>
+    </main>
+</body>
+</html> 

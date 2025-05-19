@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <title>Events</title>
+    <style>
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .event-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .event-info {
+            margin-top: 0.5rem;
+        }
+        .tournament-info {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .action-buttons {
+            margin-top: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="tournament-info" th:if="${tournament != null}">
+            <h2 th:text="${tournament.name}">Tournament Name</h2>
+            <p th:if="${tournament.city}" th:text="${tournament.city + (tournament.countryCode != null ? ', ' + tournament.countryCode : '')}">
+                Location
+            </p>
+            <p>
+                <a th:href="@{/tournaments(ownerId=${ownerId})}" class="button secondary">Back to Tournaments</a>
+            </p>
+        </div>
+        
+        <h3>Events</h3>
+        
+        <div th:if="${events.isEmpty()}" class="empty-state">
+            <p>No events found. This tournament might not have any registered events yet.</p>
+        </div>
+        
+        <div th:unless="${events.isEmpty()}" class="event-grid">
+            <div th:each="event : ${events}" class="event-card">
+                <h4 th:text="${event.name}">Event Name</h4>
+                
+                <div class="event-info">
+                    <p th:if="${event.videogame}">
+                        <strong>Game:</strong> <span th:text="${event.videogame}">Game</span>
+                    </p>
+                    <p th:if="${event.numEntrants}">
+                        <strong>Entrants:</strong> <span th:text="${event.numEntrants}">0</span>
+                    </p>
+                    <p th:if="${event.startAt}">
+                        <strong>Starts:</strong> <span th:text="${#temporals.format(event.startAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                    </p>
+                </div>
+                
+                <div class="action-buttons">
+                    <a th:href="@{/standings(eventId=${event.id})}" class="button">Standings</a>
+                    <a th:href="@{/sets(eventId=${event.id})}" class="button">Brackets</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

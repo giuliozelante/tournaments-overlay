@@ -1,0 +1,30 @@
+micronaut:
+  application:
+    name: tournaments-overlay
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /static/**
+        paths: classpath:static
+      webjars:
+        paths: classpath:META-INF/resources/webjars
+        mapping: /webjars/**
+  views:
+    thymeleaf:
+      enabled: true
+      prefix: classpath:views/
+      suffix: .html
+      template-mode: HTML
+      encoding: UTF-8
+      template-resolver:
+        prefix: classpath:views/
+        suffix: .html
+        template-mode: HTML
+apollo:
+  schema-file-path: schema.json
+graphql:
+  endpoint: https://api.start.gg/gql/alpha
+  token: ${GRAPHQL_TOKEN}
+jackson:
+  serialization-inclusion: ALWAYS

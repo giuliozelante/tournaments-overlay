@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <title>Standings</title>
+    <style>
+        .standings-container {
+            margin-top: 1.5rem;
+        }
+        .event-info {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .standings-table th,
+        .standings-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .standings-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+        .standings-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        .pagination a, .pagination span {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        .pagination .current {
+            background-color: #444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="event-info" th:if="${event != null}">
+            <h2 th:text="${event.name}">Event Name</h2>
+            <p th:if="${event.videogame}">
+                <strong>Game:</strong> <span th:text="${event.videogame}">Game</span>
+            </p>
+            <p th:if="${event.numEntrants}">
+                <strong>Entrants:</strong> <span th:text="${event.numEntrants}">0</span>
+            </p>
+            <p>
+                <a th:href="@{/events(tournamentId=${tournamentId})}" class="button secondary">Back to Events</a>
+            </p>
+        </div>
+        
+        <h3>Standings</h3>
+        
+        <div th:if="${standings.isEmpty()}" class="empty-state">
+            <p>No standings available. The event might not have started yet or results haven't been posted.</p>
+        </div>
+        
+        <div th:unless="${standings.isEmpty()}" class="standings-container">
+            <table class="standings-table">
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>Gamertag</th>
+                        <th>Record</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="standing : ${standings}">
+                        <td th:text="${standing.placement}">1</td>
+                        <td th:text="${standing.gamertag}">Player</td>
+                        <td th:text="${standing.wins + '-' + standing.losses}">0-0</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:if="${currentPage > 1}" th:href="@{/standings(eventId=${eventId}, page=${currentPage - 1}, perPage=${perPage})}">&laquo; Previous</a>
+                <span class="current" th:text="${currentPage}">1</span>
+                <a th:if="${currentPage < totalPages}" th:href="@{/standings(eventId=${eventId}, page=${currentPage + 1}, perPage=${perPage})}">Next &raquo;</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

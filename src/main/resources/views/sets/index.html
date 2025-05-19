@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <title>Bracket Sets</title>
+    <style>
+        .event-info {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .sets-container {
+            margin-top: 1.5rem;
+        }
+        .set-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .set-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        .set-matchup {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .player {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        .player.winner {
+            background-color: rgba(0, 200, 0, 0.1);
+        }
+        .player.loser {
+            background-color: rgba(200, 0, 0, 0.1);
+        }
+        .player-name {
+            font-weight: 500;
+        }
+        .round-info {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .upcoming {
+            color: #2563eb;
+        }
+        .in-progress {
+            color: #f59e0b;
+            font-weight: 500;
+        }
+        .completed {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="event-info" th:if="${event != null}">
+            <h2 th:text="${event.name}">Event Name</h2>
+            <p th:if="${event.videogame}">
+                <strong>Game:</strong> <span th:text="${event.videogame}">Game</span>
+            </p>
+            <p>
+                <a th:href="@{/events(tournamentId=${tournamentId})}" class="button secondary">Back to Events</a>
+            </p>
+        </div>
+        
+        <h3>Bracket Sets</h3>
+        
+        <div th:if="${sets.isEmpty()}" class="empty-state">
+            <p>No bracket sets available. The event might not have started yet or the bracket hasn't been created.</p>
+        </div>
+        
+        <div th:unless="${sets.isEmpty()}" class="sets-container">
+            <div th:each="set : ${sets}" class="set-card">
+                <div class="set-header">
+                    <div class="round-info" th:text="${set.fullRoundText}">Round 1</div>
+                    <div th:class="${
+                        set.state == 'COMPLETED' ? 'completed' : 
+                        set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming'
+                    }" 
+                    th:text="${
+                        set.state == 'COMPLETED' ? 'Completed' : 
+                        set.state == 'IN_PROGRESS' ? 'In Progress' : 'Upcoming'
+                    }">Status</div>
+                </div>
+                
+                <div class="set-matchup">
+                    <div th:class="${set.player1Status == 'winner' ? 'player winner' : (set.player1Status == 'loser' ? 'player loser' : 'player')}">
+                        <span class="player-name" th:text="${set.player1Name != null ? set.player1Name : 'TBD'}">Player 1</span>
+                        <span class="player-score" th:text="${set.player1Score != null ? set.player1Score : '-'}">0</span>
+                    </div>
+                    
+                    <div th:class="${set.player2Status == 'winner' ? 'player winner' : (set.player2Status == 'loser' ? 'player loser' : 'player')}">
+                        <span class="player-name" th:text="${set.player2Name != null ? set.player2Name : 'TBD'}">Player 2</span>
+                        <span class="player-score" th:text="${set.player2Score != null ? set.player2Score : '-'}">0</span>
+                    </div>
+                </div>
+                
+                <div th:if="${set.startAt}" class="set-details" style="margin-top: 0.75rem; font-size: 0.9rem; color: #666;">
+                    <strong>Scheduled:</strong> <span th:text="${#temporals.format(set.startAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 
