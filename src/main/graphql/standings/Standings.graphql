@@ -1,26 +1,50 @@
-query StandingsQuery($eventId: ID!, $page: Int, $perPage: Int) {
+query StandingsQuery($eventId: ID!, $page: Int = 1, $perPage: Int = 25, $sortBy: String = "placement ASC") {
   event(id: $eventId) {
     id
     name
-    videogame {
+    tournament {
+      id
+    }
+    phases {
       id
       name
-    }
-    standings(query: {
-      page: $page,
-      perPage: $perPage
-    }) {
-      nodes {
-        id
-        placement
-        entrant {
+      phaseGroups {
+        nodes {
           id
-          name
-        }
-        stats {
-          score {
-            label
-            value
+          displayIdentifier
+          bracketType
+          standings(query: {
+            page: $page,
+            perPage: $perPage,
+            sortBy: $sortBy
+          }) {
+            nodes {
+              id
+              placement
+              entrant {
+                id
+                name
+                participants {
+                  player {
+                    id
+                    gamerTag
+                    prefix
+                  }
+                }
+              }
+              stats {
+                score {
+                  label
+                  value
+                }
+              }
+            }
+            pageInfo {
+              page
+              total
+              perPage
+              totalPages
+            }
           }
         }
       }

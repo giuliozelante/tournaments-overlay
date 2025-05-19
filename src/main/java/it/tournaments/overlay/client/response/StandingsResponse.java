@@ -19,13 +19,55 @@ public class StandingsResponse {
     @Data
     @Serdeable
     public static class Event {
-        private StandingConnection standings;
+        private String id;
+        private String name;
+        private Tournament tournament;
+        private List<Phase> phases;
     }
 
     @Data
     @Serdeable
+    public static class Tournament {
+        private String id;
+    }
+    
+    @Data
+    @Serdeable
+    public static class Phase {
+        private String id;
+        private String name;
+        private PhaseGroupConnection phaseGroups;
+    }
+    
+    @Data
+    @Serdeable
+    public static class PhaseGroupConnection {
+        private List<PhaseGroup> nodes;
+    }
+    
+    @Data
+    @Serdeable
+    public static class PhaseGroup {
+        private String id;
+        private String displayIdentifier;
+        private String bracketType;
+        private StandingConnection standings;
+    }
+    
+    @Data
+    @Serdeable
     public static class StandingConnection {
         private List<StandingNode> nodes;
+        private PageInfo pageInfo;
+    }
+
+    @Data
+    @Serdeable
+    public static class PageInfo {
+        private Integer page;
+        private Integer total;
+        private Integer perPage;
+        private Integer totalPages;
     }
 
     @Data
@@ -40,15 +82,31 @@ public class StandingsResponse {
     @Data
     @Serdeable
     public static class Entrant {
+        private String id;
         private String name;
+        private List<Participant> participants;
     }
-
+    
+    @Data
+    @Serdeable
+    public static class Participant {
+        private Player player;
+    }
+    
+    @Data
+    @Serdeable
+    public static class Player {
+        private String id;
+        private String gamerTag;
+        private String prefix;
+    }
+    
     @Data
     @Serdeable
     public static class Stats {
         private Score score;
     }
-
+    
     @Data
     @Serdeable
     public static class Score {
