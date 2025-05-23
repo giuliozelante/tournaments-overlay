@@ -1,8 +1,10 @@
 package it.tournaments.overlay.controller;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -36,8 +38,47 @@ public class BracketController {
         
         List<BracketSet> sets = bracketService.getSetsByEventId(eventId);
         
+        // Separate winners and losers bracket sets
+        List<BracketSet> winnersSets = sets.stream()
+            .filter(set -> !set.getFullRoundText().toLowerCase().contains("loser"))
+            .collect(Collectors.toList());
+            
+        List<BracketSet> losersSets = sets.stream()
+            .filter(set -> set.getFullRoundText().toLowerCase().contains("loser"))
+            .collect(Collectors.toList());
+        
+        // Group by round (fullRoundText) while preserving order
+        Map<String, List<BracketSet>> winnersRoundsTemp = winnersSets.stream()
+            .collect(Collectors.groupingBy(
+                BracketSet::getFullRoundText, 
+                LinkedHashMap::new,
+                Collectors.toList()
+            ));
+            
+        Map<String, List<BracketSet>> losersRoundsTemp = losersSets.stream()
+            .collect(Collectors.groupingBy(
+                BracketSet::getFullRoundText, 
+                LinkedHashMap::new,
+                Collectors.toList()
+            ));
+        
+        // Reverse the order of both collections
+        Map<String, List<BracketSet>> winnersRounds = new LinkedHashMap<>();
+        winnersRoundsTemp.entrySet().stream()
+            .collect(Collectors.toList())
+            .reversed()
+            .forEach(entry -> winnersRounds.put(entry.getKey(), entry.getValue()));
+            
+        Map<String, List<BracketSet>> losersRounds = new LinkedHashMap<>();
+        losersRoundsTemp.entrySet().stream()
+            .collect(Collectors.toList())
+            .reversed()
+            .forEach(entry -> losersRounds.put(entry.getKey(), entry.getValue()));
+        
         Map<String, Object> model = new HashMap<>();
-        model.put("sets", sets);
+        model.put("sets", sets); // Keep original for backward compatibility
+        model.put("winnersRounds", winnersRounds);
+        model.put("losersRounds", losersRounds);
         model.put("eventId", eventId);
         model.put("tournamentId", tournamentId);
         

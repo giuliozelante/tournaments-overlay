@@ -3,57 +3,225 @@
       xmlns:th="http://www.thymeleaf.org"
       layout:decorate="~{layout.html}">
 <head>
-    <title>Bracket Sets</title>
+    <title>Tournament Bracket</title>
     <style>
-        .sets-container {
+        .bracket-container {
             margin-top: 1.5rem;
+            overflow-x: auto;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
         }
-        .set-card {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+        
+        .bracket-section {
+            margin-bottom: 3rem;
         }
-        .set-header {
+        
+        .bracket-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #333;
+        }
+        
+        .winners-bracket {
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .losers-bracket {
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 2rem;
+        }
+        
+        .bracket-rounds {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #eee;
+            gap: 3rem;
+            align-items: flex-start;
+            min-width: fit-content;
         }
-        .set-matchup {
+        
+        .bracket-round {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 1.5rem;
+            min-width: 200px;
         }
+        
+        .round-header {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .match-card {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .match-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .match-card.completed {
+            border-color: #28a745;
+        }
+        
+        .match-card.in-progress {
+            border-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+        
+        .match-card.upcoming {
+            border-color: #6c757d;
+            border-style: dashed;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+        
+        .match-header {
+            background-color: #495057;
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .match-players {
+            padding: 0;
+        }
+        
         .player {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem;
-            border-radius: 4px;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.2s ease;
         }
+        
+        .player:last-child {
+            border-bottom: none;
+        }
+        
         .player.winner {
-            background-color: rgba(0, 200, 0, 0.1);
+            background-color: #d4edda;
+            font-weight: 600;
+            color: #155724;
         }
+        
         .player.loser {
-            background-color: rgba(200, 0, 0, 0.1);
+            background-color: #f8d7da;
+            color: #721c24;
         }
+        
+        .player.tbd {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
         .player-name {
+            flex: 1;
             font-weight: 500;
         }
-        .round-info {
-            font-size: 0.9rem;
+        
+        .player-score {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-left: 1rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+        
+        .match-status {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-in-progress {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .status-upcoming {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .match-time {
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            font-size: 0.8rem;
             color: #666;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
         }
-        .upcoming {
-            color: #2563eb;
+        
+        /* Connector lines between matches */
+        .bracket-round::after {
+            content: '';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            width: 3rem;
+            height: 2px;
+            background-color: #dee2e6;
+            z-index: 1;
         }
-        .in-progress {
-            color: #f59e0b;
-            font-weight: 500;
+        
+        .bracket-round:last-child::after {
+            display: none;
         }
-        .completed {
-            color: #10b981;
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .bracket-rounds {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .bracket-round {
+                min-width: 100%;
+            }
+            
+            .bracket-round::after {
+                display: none;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -62,44 +230,105 @@
         <!-- Tournament Contextual Navigation -->
         <div th:replace="~{fragments/tournament-nav :: tournament-nav(${tournament}, ${tournamentId}, ${eventId}, 'brackets')}"></div>
         
-        <h3>Bracket Sets</h3>
+        <h3>Tournament Bracket</h3>
         <p th:if="${event != null}" class="event-subtitle">
             <strong th:text="${event.name}">Event Name</strong>
             <span th:if="${event.videogame}" th:text="' - ' + ${event.videogame}"> - Game</span>
         </p>
         
         <div th:if="${sets.isEmpty()}" class="empty-state">
-            <p>No bracket sets available. The event might not have started yet or the bracket hasn't been created.</p>
+            <h4>No bracket available</h4>
+            <p>The tournament bracket hasn't been created yet or no matches have been scheduled.</p>
         </div>
         
-        <div th:unless="${sets.isEmpty()}" class="sets-container">
-            <div th:each="set : ${sets}" class="set-card">
-                <div class="set-header">
-                    <div class="round-info" th:text="${set.fullRoundText}">Round 1</div>
-                    <div th:class="${
-                        set.state == 'COMPLETED' ? 'completed' : 
-                        set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming'
-                    }" 
-                    th:text="${
-                        set.state == 'COMPLETED' ? 'Completed' : 
-                        set.state == 'IN_PROGRESS' ? 'In Progress' : 'Upcoming'
-                    }">Status</div>
-                </div>
-                
-                <div class="set-matchup">
-                    <div th:class="${set.player1Status == 'winner' ? 'player winner' : (set.player1Status == 'loser' ? 'player loser' : 'player')}">
-                        <span class="player-name" th:text="${set.player1Name != null ? set.player1Name : 'TBD'}">Player 1</span>
-                        <span class="player-score" th:text="${set.player1Score != null ? set.player1Score : '-'}">0</span>
+        <div th:unless="${sets.isEmpty()}" class="bracket-container">
+            <!-- Winners Bracket -->
+            <div class="bracket-section winners-bracket" th:if="${!winnersRounds.isEmpty()}">
+                <div class="bracket-title">Winners Bracket</div>
+                <div class="bracket-rounds">
+                    <!-- Use pre-processed winnersRounds data -->
+                    <div th:each="roundEntry : ${winnersRounds}" class="bracket-round">
+                        <div class="round-header" th:text="${roundEntry.key}">Round Name</div>
+                        <div th:each="set : ${roundEntry.value}" th:class="${'match-card ' + 
+                            (set.state == 'COMPLETED' ? 'completed' : 
+                             set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}">
+                            
+                            <div class="match-header" th:text="${set.fullRoundText}">Round</div>
+                            
+                            <div th:class="${'match-status status-' + 
+                                (set.state == 'COMPLETED' ? 'completed' : 
+                                 set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}"
+                                 th:text="${set.state == 'COMPLETED' ? 'Completed' : 
+                                          set.state == 'IN_PROGRESS' ? 'Live' : 'Upcoming'}">Status</div>
+                            
+                            <div class="match-players">
+                                <div th:class="${'player ' + 
+                                    (set.player1Name == null or set.player1Name == '' ? 'tbd' :
+                                     set.player1Status == 'winner' ? 'winner' : 
+                                     set.player1Status == 'loser' ? 'loser' : '')}">
+                                    <span class="player-name" th:text="${set.player1Name != null ? set.player1Name : 'TBD'}">Player 1</span>
+                                    <span class="player-score" th:text="${set.player1Score != null ? set.player1Score : '-'}">0</span>
+                                </div>
+                                
+                                <div th:class="${'player ' + 
+                                    (set.player2Name == null or set.player2Name == '' ? 'tbd' :
+                                     set.player2Status == 'winner' ? 'winner' : 
+                                     set.player2Status == 'loser' ? 'loser' : '')}">
+                                    <span class="player-name" th:text="${set.player2Name != null ? set.player2Name : 'TBD'}">Player 2</span>
+                                    <span class="player-score" th:text="${set.player2Score != null ? set.player2Score : '-'}">0</span>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${set.startAt}" class="match-time">
+                                <span th:text="${#temporals.format(set.startAt, 'dd MMM HH:mm')}">Date</span>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div th:class="${set.player2Status == 'winner' ? 'player winner' : (set.player2Status == 'loser' ? 'player loser' : 'player')}">
-                        <span class="player-name" th:text="${set.player2Name != null ? set.player2Name : 'TBD'}">Player 2</span>
-                        <span class="player-score" th:text="${set.player2Score != null ? set.player2Score : '-'}">0</span>
-                    </div>
                 </div>
-                
-                <div th:if="${set.startAt}" class="set-details" style="margin-top: 0.75rem; font-size: 0.9rem; color: #666;">
-                    <strong>Scheduled:</strong> <span th:text="${#temporals.format(set.startAt, 'dd MMM yyyy HH:mm')}">Date</span>
+            </div>
+            
+            <!-- Losers Bracket -->
+            <div class="bracket-section losers-bracket" th:if="${!losersRounds.isEmpty()}">
+                <div class="bracket-title">Losers Bracket</div>
+                <div class="bracket-rounds">
+                    <!-- Use pre-processed losersRounds data -->
+                    <div th:each="roundEntry : ${losersRounds}" class="bracket-round">
+                        <div class="round-header" th:text="${roundEntry.key}">Round Name</div>
+                        <div th:each="set : ${roundEntry.value}" th:class="${'match-card ' + 
+                            (set.state == 'COMPLETED' ? 'completed' : 
+                             set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}">
+                            
+                            <div class="match-header" th:text="${set.fullRoundText}">Round</div>
+                            
+                            <div th:class="${'match-status status-' + 
+                                (set.state == 'COMPLETED' ? 'completed' : 
+                                 set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}"
+                                 th:text="${set.state == 'COMPLETED' ? 'Completed' : 
+                                          set.state == 'IN_PROGRESS' ? 'Live' : 'Upcoming'}">Status</div>
+                            
+                            <div class="match-players">
+                                <div th:class="${'player ' + 
+                                    (set.player1Name == null or set.player1Name == '' ? 'tbd' :
+                                     set.player1Status == 'winner' ? 'winner' : 
+                                     set.player1Status == 'loser' ? 'loser' : '')}">
+                                    <span class="player-name" th:text="${set.player1Name != null ? set.player1Name : 'TBD'}">Player 1</span>
+                                    <span class="player-score" th:text="${set.player1Score != null ? set.player1Score : '-'}">0</span>
+                                </div>
+                                
+                                <div th:class="${'player ' + 
+                                    (set.player2Name == null or set.player2Name == '' ? 'tbd' :
+                                     set.player2Status == 'winner' ? 'winner' : 
+                                     set.player2Status == 'loser' ? 'loser' : '')}">
+                                    <span class="player-name" th:text="${set.player2Name != null ? set.player2Name : 'TBD'}">Player 2</span>
+                                    <span class="player-score" th:text="${set.player2Score != null ? set.player2Score : '-'}">0</span>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${set.startAt}" class="match-time">
+                                <span th:text="${#temporals.format(set.startAt, 'dd MMM HH:mm')}">Date</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
