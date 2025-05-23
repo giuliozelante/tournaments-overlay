@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
       layout:decorate="~{layout.html}">
 <head>
     <title>Events</title>
@@ -20,11 +21,6 @@
         .event-info {
             margin-top: 0.5rem;
         }
-        .tournament-info {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
         .action-buttons {
             margin-top: auto;
             display: flex;
@@ -34,15 +30,8 @@
 </head>
 <body>
     <main layout:fragment="content">
-        <div class="tournament-info" th:if="${tournament != null}">
-            <h2 th:text="${tournament.name}">Tournament Name</h2>
-            <p th:if="${tournament.city}" th:text="${tournament.city + (tournament.countryCode != null ? ', ' + tournament.countryCode : '')}">
-                Location
-            </p>
-            <p>
-                <a th:href="@{/tournaments(ownerId=${ownerId})}" class="button secondary">Back to Tournaments</a>
-            </p>
-        </div>
+        <!-- Tournament Contextual Navigation -->
+        <div th:replace="~{fragments/tournament-nav :: tournament-nav(${tournament}, ${tournamentId}, null, 'events')}"></div>
         
         <h3>Events</h3>
         

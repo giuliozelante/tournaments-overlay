@@ -38,6 +38,13 @@ dependencies {
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     
+    // Development tools
+    developmentOnly("io.micronaut:micronaut-runtime")
+    developmentOnly("io.micronaut:micronaut-management")
+    
+    // Reactive streams for SSE
+    implementation("io.micronaut.reactor:micronaut-reactor")
+    
     // HTTP client
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
@@ -103,4 +110,35 @@ tasks.named("test") {
 
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
+}
+
+// Development task with hot reloading
+tasks.register("runDev") {
+    group = "application"
+    description = "Run the application in development mode with hot reloading"
+    dependsOn("classes")
+    doLast {
+        javaexec {
+            classpath = sourceSets.main.runtimeClasspath
+            mainClass = application.mainClass
+            systemProperty("micronaut.environments", "development")
+            systemProperty("micronaut.server.restart.enabled", "true")
+            systemProperty("micronaut.views.thymeleaf.cache", "false")
+            jvmArgs(
+                "-Dfile.encoding=UTF-8",
+                "-Dmicronaut.io.watch.restart=true",
+                "-Dmicronaut.io.watch.paths=src/main/resources"
+            )
+        }
+    }
+}
+
+// Enhanced run task for development
+run {
+    systemProperty("micronaut.environments", "development")
+    systemProperty("micronaut.server.restart.enabled", "true")
+    systemProperty("micronaut.views.thymeleaf.cache", "false")
+    jvmArgs(
+        "-Dfile.encoding=UTF-8"
+    )
 }

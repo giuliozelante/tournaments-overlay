@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
       layout:decorate="~{layout.html}">
 <head>
     <title>Bracket Sets</title>
     <style>
-        .event-info {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
         .sets-container {
             margin-top: 1.5rem;
         }
@@ -63,17 +59,14 @@
 </head>
 <body>
     <main layout:fragment="content">
-        <div class="event-info" th:if="${event != null}">
-            <h2 th:text="${event.name}">Event Name</h2>
-            <p th:if="${event.videogame}">
-                <strong>Game:</strong> <span th:text="${event.videogame}">Game</span>
-            </p>
-            <p>
-                <a th:href="@{/events(tournamentId=${tournamentId})}" class="button secondary">Back to Events</a>
-            </p>
-        </div>
+        <!-- Tournament Contextual Navigation -->
+        <div th:replace="~{fragments/tournament-nav :: tournament-nav(${tournament}, ${tournamentId}, ${eventId}, 'brackets')}"></div>
         
         <h3>Bracket Sets</h3>
+        <p th:if="${event != null}" class="event-subtitle">
+            <strong th:text="${event.name}">Event Name</strong>
+            <span th:if="${event.videogame}" th:text="' - ' + ${event.videogame}"> - Game</span>
+        </p>
         
         <div th:if="${sets.isEmpty()}" class="empty-state">
             <p>No bracket sets available. The event might not have started yet or the bracket hasn't been created.</p>

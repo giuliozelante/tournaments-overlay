@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .tournament-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .tournament-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .tournament-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 0.5rem;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        .pagination a, .pagination span {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        .pagination .current {
+            background-color: #444;
+            color: white;
+        }
+        .owner-id-form {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        .owner-id-form input {
+            flex: 1;
+            padding: 0.5rem;
+        }
+        .owner-id-form button {
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h3>Tournaments</h3>
+    
+    <!-- Owner ID Form -->
+    <form class="owner-id-form" method="get" action="/tournaments">
+        <div>
+            <label for="ownerId">Owner ID:</label>
+            <input type="text" id="ownerId" name="ownerId" th:value="${ownerId}" placeholder="Enter Start.gg Owner ID">
+        </div>
+        <button type="submit">Load Tournaments</button>
+    </form>
+    
+    <div class="tournament-grid">
+        <div th:each="tournament : ${tournaments}" class="tournament-card">
+            <img th:if="${tournament.imageUrl}" th:src="${tournament.imageUrl}" alt="Tournament image" />
+            <h4 th:text="${tournament.name}">Tournament Name</h4>
+            <p th:if="${tournament.city}" th:text="${tournament.city + (tournament.countryCode != null ? ', ' + tournament.countryCode : '')}">
+                Location
+            </p>
+            <p th:if="${tournament.startAt}">
+                <strong>Starts:</strong> <span th:text="${#temporals.format(tournament.startAt, 'dd MMM yyyy')}">Date</span>
+            </p>
+            <p th:if="${tournament.endAt}">
+                <strong>Ends:</strong> <span th:text="${#temporals.format(tournament.endAt, 'dd MMM yyyy')}">Date</span>
+            </p>
+            <a th:href="@{/events(tournamentId=${tournament.id})}" class="button">View Events</a>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination">
+        <a th:if="${currentPage > 1}" th:href="@{/tournaments(ownerId=${ownerId}, page=${currentPage - 1}, perPage=${perPage})}">&laquo; Previous</a>
+        <span class="current" th:text="${currentPage}">1</span>
+        <a th:href="@{/tournaments(ownerId=${ownerId}, page=${currentPage + 1}, perPage=${perPage})}">Next &raquo;</a>
+    </div>
+</body>
+</html> 

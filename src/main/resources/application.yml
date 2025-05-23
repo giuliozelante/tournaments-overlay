@@ -21,6 +21,31 @@ micronaut:
         prefix: classpath:views/
         suffix: .html
         template-mode: HTML
+        cache: false
+      cache: false
+  server:
+    thread-selection: AUTO
+    netty:
+      event-loops:
+        default:
+          num-threads: 8
+# Development-specific settings
+---
+micronaut:
+  environments: development
+  views:
+    thymeleaf:
+      cache: false
+      template-resolver:
+        cache: false
+        cacheable: false
+  server:
+    restart:
+      enabled: true
+      paths:
+        - src/main/resources/views
+        - src/main/resources/static
+    development: true
 apollo:
   schema-file-path: schema.json
 graphql:

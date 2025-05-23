@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Development Tools Fragment -->
+<div th:fragment="dev-tools" th:if="${@environment.getActiveNames().contains('development')}">
+    <!-- Simple Meta Refresh Alternative (uncomment if JavaScript approach doesn't work) -->
+    <!--
+    <meta http-equiv="refresh" content="5">
+    -->
+    
+    <!-- Development Info -->
+    <style>
+        .dev-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            z-index: 10000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            max-width: 200px;
+        }
+        .dev-info .title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .dev-info .status {
+            opacity: 0.8;
+        }
+    </style>
+    
+    <div class="dev-info">
+        <div class="title">🚀 Development Mode</div>
+        <div class="status">Auto-reload enabled</div>
+        <div class="status" style="font-size: 10px; margin-top: 2px;">
+            Watching for changes...
+        </div>
+    </div>
+</div>
+
+</html> 

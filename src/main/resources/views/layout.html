@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html
-    lang="en" 
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Tournaments Overlay</title>
-    
+
     <!-- Water.css for minimal styling -->
     <link rel="stylesheet" th:href="@{/webjars/water.css/2.1.1/out/dark.css}">
-    
+
     <!-- HTMX -->
     <script type="text/javascript" th:src="@{/webjars/htmx.org/2.0.1/dist/htmx.min.js}"></script>
     <script type="text/javascript" th:src="@{/webjars/htmx-ext-head-support/2.0.1/head-support.js}"></script>
-    
+
     <!-- Custom CSS -->
     <style>
         .container {
@@ -21,27 +20,205 @@
             margin: 0 auto;
             padding: 1rem;
         }
+
         nav {
             margin-bottom: 2rem;
         }
+
         nav ul {
             display: flex;
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         nav ul li {
             margin-right: 1rem;
         }
+
         footer {
             margin-top: 2rem;
             text-align: center;
         }
+
+        /* Development auto-reload indicator */
+        .dev-indicator {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 9999;
+            display: none;
+        }
+
+        .dev-indicator.checking {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .dev-indicator.error {
+            background: #dc3545;
+        }
     </style>
-    
+
+    <!-- Development Auto-Reload Script -->
+    <script>
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+
+                let lastStartup = null;
+                let eventSource = null;
+                let retryCount = 0;
+                let pollInterval = null;
+                const maxRetries = 3;
+                
+                // Create indicator
+                const indicator = document.createElement('div');
+                indicator.className = 'dev-indicator';
+                indicator.textContent = '🔄 Dev Mode';
+                document.body.appendChild(indicator);
+                indicator.style.display = 'block';
+                
+                function connectSSE() {
+                    if (eventSource) {
+                        eventSource.close();
+                    }
+                    
+                    try {
+                        console.log('Attempting SSE connection...');
+                        eventSource = new EventSource('/dev/reload-events');
+                        
+                        eventSource.onopen = function () {
+                            retryCount = 0; // Reset retry count on successful connection
+                            indicator.className = 'dev-indicator';
+                            indicator.textContent = '🔄 Dev Mode (SSE)';
+                            console.log('SSE connection opened successfully');
+                        };
+                        
+                        eventSource.onmessage = function (event) {
+                            const data = event.data;
+                            if (data.startsWith('startup:')) {
+                                const currentStartup = data.split(':')[1];
+                                
+                                if (lastStartup === null) {
+                                    lastStartup = currentStartup;
+                                    indicator.className = 'dev-indicator';
+                                    indicator.textContent = '🔄 Dev Mode (SSE)';
+                                } else if (currentStartup !== lastStartup) {
+                                    indicator.textContent = '🔄 Reloading...';
+                                    console.log('Application restarted, reloading page...');
+                                    setTimeout(() => window.location.reload(), 300);
+                                }
+                            }
+                        };
+                        
+                        eventSource.onerror = function (error) {
+                            console.log('SSE error:', error);
+                            eventSource.close();
+                            
+                            if (retryCount < maxRetries) {
+                                retryCount++;
+                                indicator.className = 'dev-indicator checking';
+                                indicator.textContent = `🔄 Retrying SSE... (${retryCount}/${maxRetries})`;
+                                console.log(`SSE retry ${retryCount}/${maxRetries} in ${2 * retryCount} seconds`);
+                                setTimeout(() => connectSSE(), 2000 * retryCount);
+                            } else {
+                                console.log('Max SSE retries reached, falling back to polling...');
+                                startPollingFallback();
+                            }
+                        };
+                    } catch (error) {
+                        console.log('Failed to create SSE connection:', error);
+                        startPollingFallback();
+                    }
+                }
+                
+                function startPollingFallback() {
+                    console.log('Using polling fallback...');
+                    indicator.className = 'dev-indicator checking';
+                    indicator.textContent = '🔍 Polling Mode';
+                    
+                    function poll() {
+                        fetch('/dev/health', { 
+                            cache: 'no-cache',
+                            headers: { 'Cache-Control': 'no-cache' }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (lastStartup === null) {
+                                lastStartup = data.startup;
+                                indicator.className = 'dev-indicator';
+                                indicator.textContent = '🔄 Polling Mode';
+                                console.log('Development auto-reload active (polling)');
+                            } else if (data.startup !== lastStartup) {
+                                indicator.textContent = '🔄 Reloading...';
+                                console.log('Application restarted, reloading page...');
+                                if (pollInterval) {
+                                    clearInterval(pollInterval);
+                                }
+                                setTimeout(() => window.location.reload(), 300);
+                            }
+                        })
+                        .catch(error => {
+                            // In production, dev endpoints won't exist, so hide indicator
+                            indicator.style.display = 'none';
+                            if (pollInterval) {
+                                clearInterval(pollInterval);
+                            }
+                            console.log('Development endpoints not available (probably production)');
+                        });
+                    }
+                    
+                    // Poll every 2 seconds as fallback
+                    pollInterval = setInterval(poll, 2000);
+                    poll(); // Initial poll
+                }
+                
+                // Check if dev endpoints are available first
+                fetch('/dev/health', { 
+                    cache: 'no-cache',
+                    headers: { 'Cache-Control': 'no-cache' }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Development mode detected, starting SSE...');
+                        connectSSE();
+                    } else {
+                        indicator.style.display = 'none';
+                        console.log('Development endpoints not available');
+                    }
+                })
+                .catch(error => {
+                    indicator.style.display = 'none';
+                    console.log('Development mode not active');
+                });
+                
+                // Cleanup on page unload
+                window.addEventListener('beforeunload', function() {
+                    if (eventSource) {
+                        eventSource.close();
+                    }
+                    if (pollInterval) {
+                        clearInterval(pollInterval);
+                    }
+                });
+            });
+        })();
+    </script>
+
     <!-- Page-specific head content -->
     <th:block layout:fragment="head"></th:block>
 </head>
+
 <body hx-ext="head-support">
     <div class="container">
         <header>
@@ -50,20 +227,18 @@
                 <ul>
                     <li><a href="/" th:href="@{/}">Home</a></li>
                     <li><a href="/tournaments" th:href="@{/tournaments}">Tournaments</a></li>
-                    <li><a href="/events" th:href="@{/events}">Events</a></li>
-                    <li><a href="/standings" th:href="@{/standings}">Standings</a></li>
-                    <li><a href="/sets" th:href="@{/sets}">Brackets</a></li>
                 </ul>
             </nav>
         </header>
-        
+
         <main layout:fragment="content">
             <!-- Page content will be inserted here -->
         </main>
-        
+
         <footer>
             <p>&copy; 2025 Tournaments Overlay</p>
         </footer>
     </div>
 </body>
-</html> 
+
+</html>

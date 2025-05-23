@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<!-- Tournament Contextual Navigation Fragment -->
+<div th:fragment="tournament-nav(tournament, tournamentId, eventId, currentPage)" class="tournament-nav">
+    <style>
+        .tournament-nav {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .tournament-title {
+            margin: 0 0 0.75rem 0;
+            color: #495057;
+        }
+        .tournament-breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .tournament-breadcrumb a {
+            text-decoration: none;
+            color: #0066cc;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .tournament-breadcrumb a:hover {
+            background-color: #e9ecef;
+        }
+        .tournament-breadcrumb .current {
+            background-color: #0066cc;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .tournament-breadcrumb .separator {
+            color: #6c757d;
+        }
+        .tournament-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .tournament-actions a {
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            border: 1px solid #dee2e6;
+            background-color: white;
+            color: #495057;
+            transition: all 0.2s;
+        }
+        .tournament-actions a:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        .tournament-actions a.primary {
+            background-color: #0066cc;
+            border-color: #0066cc;
+            color: white;
+        }
+        .tournament-actions a.primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
+    
+    <div class="tournament-nav">
+        <!-- Tournament Title -->
+        <h4 class="tournament-title" th:if="${tournament != null}" th:text="${tournament.name}">Tournament Name</h4>
+        
+        <!-- Breadcrumb Navigation -->
+        <div class="tournament-breadcrumb">
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <span class="separator">›</span>
+            
+            <th:block th:if="${tournament != null}">
+                <a th:href="@{/events(tournamentId=${tournamentId})}" th:text="${tournament.name}">Tournament</a>
+                <span class="separator">›</span>
+            </th:block>
+            
+            <th:block th:switch="${currentPage}">
+                <span th:case="'events'" class="current">Events</span>
+                <span th:case="'standings'" class="current">Standings</span>
+                <span th:case="'brackets'" class="current">Brackets</span>
+            </th:block>
+        </div>
+        
+        <!-- Tournament Actions -->
+        <div class="tournament-actions" th:if="${tournamentId != null}">
+            <a th:href="@{/events(tournamentId=${tournamentId})}" 
+               th:classappend="${currentPage == 'events'} ? 'primary' : ''"
+               th:text="'Events'">Events</a>
+            
+            <th:block th:if="${eventId != null}">
+                <a th:href="@{/standings(eventId=${eventId})}" 
+                   th:classappend="${currentPage == 'standings'} ? 'primary' : ''"
+                   th:text="'Standings'">Standings</a>
+                   
+                <a th:href="@{/sets(eventId=${eventId})}" 
+                   th:classappend="${currentPage == 'brackets'} ? 'primary' : ''"
+                   th:text="'Brackets'">Brackets</a>
+            </th:block>
+        </div>
+    </div>
+</div>
+
+</html> 
