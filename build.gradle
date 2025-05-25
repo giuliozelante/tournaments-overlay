@@ -118,9 +118,12 @@ graalvmNative {
             buildArgs.add("--initialize-at-run-time=com.sun.beans")
             buildArgs.add("--initialize-at-run-time=java.beans")
             buildArgs.add("--initialize-at-run-time=kotlin.coroutines.intrinsics")
+            buildArgs.add("--initialize-at-run-time=org.thymeleaf")
+            buildArgs.add("--initialize-at-run-time=com.fasterxml.jackson")
             buildArgs.add("--enable-url-protocols=http,https")
             buildArgs.add("-H:+ReportExceptionStackTraces")
-            buildArgs.add("-H:+AllowVMInspection")
+            buildArgs.add("--enable-monitoring")
+            buildArgs.add("--report-unsupported-elements-at-runtime")
         }
     }
 }
