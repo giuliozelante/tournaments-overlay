@@ -205,22 +205,6 @@
             display: none;
         }
         
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .bracket-rounds {
-                flex-direction: column;
-                gap: 2rem;
-            }
-            
-            .bracket-round {
-                min-width: 100%;
-            }
-            
-            .bracket-round::after {
-                display: none;
-            }
-        }
-        
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -262,12 +246,6 @@
                             
                             <div class="match-header" th:text="${set.fullRoundText}">Round</div>
                             
-                            <div th:class="${'match-status status-' + 
-                                (set.state == 'COMPLETED' ? 'completed' : 
-                                 set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}"
-                                 th:text="${set.state == 'COMPLETED' ? 'Completed' : 
-                                          set.state == 'IN_PROGRESS' ? 'Live' : 'Upcoming'}">Status</div>
-                            
                             <div class="match-players">
                                 <div th:class="${'player ' + 
                                     (set.player1Name == null or set.player1Name == '' ? 'tbd' :
@@ -306,12 +284,6 @@
                              set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}">
                             
                             <div class="match-header" th:text="${set.fullRoundText}">Round</div>
-                            
-                            <div th:class="${'match-status status-' + 
-                                (set.state == 'COMPLETED' ? 'completed' : 
-                                 set.state == 'IN_PROGRESS' ? 'in-progress' : 'upcoming')}"
-                                 th:text="${set.state == 'COMPLETED' ? 'Completed' : 
-                                          set.state == 'IN_PROGRESS' ? 'Live' : 'Upcoming'}">Status</div>
                             
                             <div class="match-players">
                                 <div th:class="${'player ' + 

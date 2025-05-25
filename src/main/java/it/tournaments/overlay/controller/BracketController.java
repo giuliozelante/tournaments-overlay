@@ -41,48 +41,51 @@ public class BracketController {
         // Separate winners and losers bracket sets
         List<BracketSet> winnersSets = sets.stream()
             .filter(set -> !set.getFullRoundText().toLowerCase().contains("loser"))
-            .collect(Collectors.toList());
+            .toList();
             
         List<BracketSet> losersSets = sets.stream()
             .filter(set -> set.getFullRoundText().toLowerCase().contains("loser"))
-            .collect(Collectors.toList());
+            .toList();
         
-        // Group by round (fullRoundText) while preserving order
-        Map<String, List<BracketSet>> winnersRoundsTemp = winnersSets.stream()
-            .collect(Collectors.groupingBy(
-                BracketSet::getFullRoundText, 
-                LinkedHashMap::new,
-                Collectors.toList()
-            ));
-            
-        Map<String, List<BracketSet>> losersRoundsTemp = losersSets.stream()
-            .collect(Collectors.groupingBy(
-                BracketSet::getFullRoundText, 
-                LinkedHashMap::new,
-                Collectors.toList()
-            ));
-        
-        // Reverse the order of both collections
-        Map<String, List<BracketSet>> winnersRounds = new LinkedHashMap<>();
-        winnersRoundsTemp.entrySet().stream()
-            .collect(Collectors.toList())
-            .reversed()
-            .forEach(entry -> winnersRounds.put(entry.getKey(), entry.getValue()));
-            
-        Map<String, List<BracketSet>> losersRounds = new LinkedHashMap<>();
-        losersRoundsTemp.entrySet().stream()
-            .collect(Collectors.toList())
-            .reversed()
-            .forEach(entry -> losersRounds.put(entry.getKey(), entry.getValue()));
+        Map<String, List<BracketSet>> winnersRounds = groupAndSortByRound(winnersSets);
+        Map<String, List<BracketSet>> losersRounds = groupAndSortByRound(losersSets);
         
         Map<String, Object> model = new HashMap<>();
-        model.put("sets", sets); // Keep original for backward compatibility
+        model.put("sets", sets);
         model.put("winnersRounds", winnersRounds);
         model.put("losersRounds", losersRounds);
         model.put("eventId", eventId);
         model.put("tournamentId", tournamentId);
         
-        // Add event information if available
+        addEventToModel(model, eventId, tournamentId);
+        
+        return model;
+    }
+    
+    private Map<String, List<BracketSet>> groupAndSortByRound(List<BracketSet> sets) {
+        Map<String, List<BracketSet>> roundsTemp = sets.stream()
+            .collect(Collectors.groupingBy(
+                BracketSet::getFullRoundText, 
+                LinkedHashMap::new,
+                Collectors.toList()
+            ));
+            
+        Map<String, List<BracketSet>> rounds = new LinkedHashMap<>();
+        roundsTemp.entrySet().stream()
+            .sorted((e1, e2) -> {
+                Long id1 = e1.getValue().isEmpty() ? Long.MAX_VALUE : 
+                    (e1.getValue().get(0).getId() != null ? e1.getValue().get(0).getId() : Long.MAX_VALUE);
+                Long id2 = e2.getValue().isEmpty() ? Long.MAX_VALUE : 
+                    (e2.getValue().get(0).getId() != null ? e2.getValue().get(0).getId() : Long.MAX_VALUE);
+                return Long.compare(id1, id2);
+            })
+            .toList()
+            .forEach(entry -> rounds.put(entry.getKey(), entry.getValue()));
+            
+        return rounds;
+    }
+    
+    private void addEventToModel(Map<String, Object> model, Long eventId, Long tournamentId) {
         if (tournamentId > 0) {
             try {
                 List<Event> events = eventService.getEventsByTournamentId(tournamentId);
@@ -98,7 +101,5 @@ public class BracketController {
                 log.warn("Could not fetch event information", e);
             }
         }
-        
-        return model;
     }
 } 
