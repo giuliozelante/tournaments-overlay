@@ -115,14 +115,16 @@ tasks.named("dockerfileNative") {
 graalvmNative {
     binaries {
         main {
-            buildArgs.add("--initialize-at-run-time=com.sun.beans")
-            buildArgs.add("--initialize-at-run-time=java.beans")
-            buildArgs.add("--initialize-at-run-time=kotlin.coroutines.intrinsics")
-            buildArgs.add("--initialize-at-run-time=org.thymeleaf")
-            buildArgs.add("--initialize-at-run-time=com.fasterxml.jackson")
+            buildArgs.add("--initialize-at-run-time=com.sun.beans.introspect.ClassInfo")
+            buildArgs.add("--initialize-at-run-time=com.sun.beans.introspect.MethodInfo")
+            buildArgs.add("--initialize-at-run-time=com.sun.beans.TypeResolver")
+            buildArgs.add("--initialize-at-run-time=com.sun.beans.finder.MethodFinder")
+            buildArgs.add("--initialize-at-run-time=java.beans.ThreadGroupContext")
+            buildArgs.add("--initialize-at-run-time=java.beans.Introspector")
+            buildArgs.add("--initialize-at-run-time=kotlin.coroutines.intrinsics.CoroutineSingletons")
             buildArgs.add("--enable-url-protocols=http,https")
             buildArgs.add("-H:+ReportExceptionStackTraces")
-            buildArgs.add("--enable-monitoring")
+            buildArgs.add("--enable-monitoring=heapdump,jfr")
             buildArgs.add("--report-unsupported-elements-at-runtime")
         }
     }
