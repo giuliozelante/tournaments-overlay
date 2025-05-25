@@ -78,7 +78,7 @@ dependencies {
     runtimeOnly("org.yaml:snakeyaml")
     runtimeOnly("org.webjars.npm:htmx.org:2.0.1")
     runtimeOnly("org.webjars.npm:htmx-ext-head-support:2.0.1")
-    runtimeOnly("org.webjars.npm:water.css:2.1.1")
+    runtimeOnly("org.webjars.npm:materializecss__materialize:2.1.1")
     
     // Testing
     testImplementation("io.micronaut:micronaut-http-client")
@@ -110,6 +110,19 @@ tasks.named("test") {
 
 tasks.named("dockerfileNative") {
     jdkVersion = "21"
+}
+
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add("--initialize-at-run-time=com.sun.beans")
+            buildArgs.add("--initialize-at-run-time=java.beans")
+            buildArgs.add("--initialize-at-run-time=kotlin.coroutines.intrinsics")
+            buildArgs.add("--enable-url-protocols=http,https")
+            buildArgs.add("-H:+ReportExceptionStackTraces")
+            buildArgs.add("-H:+AllowVMInspection")
+        }
+    }
 }
 
 // Development task with hot reloading

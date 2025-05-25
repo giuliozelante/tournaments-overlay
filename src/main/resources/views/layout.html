@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Tournaments Overlay</title>
 
-    <!-- Water.css for minimal styling -->
-    <link rel="stylesheet" th:href="@{/webjars/water.css/2.1.1/out/dark.css}">
+    <!-- Materialize.css for minimal styling -->
+    <link rel="stylesheet" th:href="@{/webjars/materializecss/2.1.1/dist/css/materialize.min.css}">
+
+    <script type="text/javascript" th:src="@{/webjars/materializecss/2.1.1/dist/js/materialize.min.js}"></script>
 
     <!-- HTMX -->
     <script type="text/javascript" th:src="@{/webjars/htmx.org/2.0.1/dist/htmx.min.js}"></script>
@@ -16,8 +18,7 @@
     <!-- Custom CSS -->
     <style>
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            margin: 0 1rem;
             padding: 1rem;
         }
 
@@ -75,35 +76,35 @@
                 let retryCount = 0;
                 let pollInterval = null;
                 const maxRetries = 3;
-                
+
                 // Create indicator
                 const indicator = document.createElement('div');
                 indicator.className = 'dev-indicator';
                 indicator.textContent = '🔄 Dev Mode';
                 document.body.appendChild(indicator);
                 indicator.style.display = 'block';
-                
+
                 function connectSSE() {
                     if (eventSource) {
                         eventSource.close();
                     }
-                    
+
                     try {
                         console.log('Attempting SSE connection...');
                         eventSource = new EventSource('/dev/reload-events');
-                        
+
                         eventSource.onopen = function () {
                             retryCount = 0; // Reset retry count on successful connection
                             indicator.className = 'dev-indicator';
                             indicator.textContent = '🔄 Dev Mode (SSE)';
                             console.log('SSE connection opened successfully');
                         };
-                        
+
                         eventSource.onmessage = function (event) {
                             const data = event.data;
                             if (data.startsWith('startup:')) {
                                 const currentStartup = data.split(':')[1];
-                                
+
                                 if (lastStartup === null) {
                                     lastStartup = currentStartup;
                                     indicator.className = 'dev-indicator';
@@ -115,11 +116,11 @@
                                 }
                             }
                         };
-                        
+
                         eventSource.onerror = function (error) {
                             console.log('SSE error:', error);
                             eventSource.close();
-                            
+
                             if (retryCount < maxRetries) {
                                 retryCount++;
                                 indicator.className = 'dev-indicator checking';
@@ -136,74 +137,74 @@
                         startPollingFallback();
                     }
                 }
-                
+
                 function startPollingFallback() {
                     console.log('Using polling fallback...');
                     indicator.className = 'dev-indicator checking';
                     indicator.textContent = '🔍 Polling Mode';
-                    
+
                     function poll() {
-                        fetch('/dev/health', { 
+                        fetch('/dev/health', {
                             cache: 'no-cache',
                             headers: { 'Cache-Control': 'no-cache' }
                         })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (lastStartup === null) {
-                                lastStartup = data.startup;
-                                indicator.className = 'dev-indicator';
-                                indicator.textContent = '🔄 Polling Mode';
-                                console.log('Development auto-reload active (polling)');
-                            } else if (data.startup !== lastStartup) {
-                                indicator.textContent = '🔄 Reloading...';
-                                console.log('Application restarted, reloading page...');
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (lastStartup === null) {
+                                    lastStartup = data.startup;
+                                    indicator.className = 'dev-indicator';
+                                    indicator.textContent = '🔄 Polling Mode';
+                                    console.log('Development auto-reload active (polling)');
+                                } else if (data.startup !== lastStartup) {
+                                    indicator.textContent = '🔄 Reloading...';
+                                    console.log('Application restarted, reloading page...');
+                                    if (pollInterval) {
+                                        clearInterval(pollInterval);
+                                    }
+                                    setTimeout(() => window.location.reload(), 300);
+                                }
+                            })
+                            .catch(error => {
+                                // In production, dev endpoints won't exist, so hide indicator
+                                indicator.style.display = 'none';
                                 if (pollInterval) {
                                     clearInterval(pollInterval);
                                 }
-                                setTimeout(() => window.location.reload(), 300);
-                            }
-                        })
-                        .catch(error => {
-                            // In production, dev endpoints won't exist, so hide indicator
-                            indicator.style.display = 'none';
-                            if (pollInterval) {
-                                clearInterval(pollInterval);
-                            }
-                            console.log('Development endpoints not available (probably production)');
-                        });
+                                console.log('Development endpoints not available (probably production)');
+                            });
                     }
-                    
+
                     // Poll every 2 seconds as fallback
                     pollInterval = setInterval(poll, 2000);
                     poll(); // Initial poll
                 }
-                
+
                 // Check if dev endpoints are available first
-                fetch('/dev/health', { 
+                fetch('/dev/health', {
                     cache: 'no-cache',
                     headers: { 'Cache-Control': 'no-cache' }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Development mode detected, starting SSE...');
-                        connectSSE();
-                    } else {
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Development mode detected, starting SSE...');
+                            connectSSE();
+                        } else {
+                            indicator.style.display = 'none';
+                            console.log('Development endpoints not available');
+                        }
+                    })
+                    .catch(error => {
                         indicator.style.display = 'none';
-                        console.log('Development endpoints not available');
-                    }
-                })
-                .catch(error => {
-                    indicator.style.display = 'none';
-                    console.log('Development mode not active');
-                });
-                
+                        console.log('Development mode not active');
+                    });
+
                 // Cleanup on page unload
-                window.addEventListener('beforeunload', function() {
+                window.addEventListener('beforeunload', function () {
                     if (eventSource) {
                         eventSource.close();
                     }

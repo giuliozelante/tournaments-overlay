@@ -2,7 +2,7 @@ query SetsQuery($eventId: ID!, $page: Int, $perPage: Int) {
   event(id: $eventId) {
     id
     name
-    sets(page: $page, perPage: $perPage) {
+    sets(page: $page, perPage: $perPage, sortType: CALL_ORDER) {
       nodes {
         id
         fullRoundText
@@ -26,4 +26,4 @@ query SetsQuery($eventId: ID!, $page: Int, $perPage: Int) {
       }
     }
   }
-} 
+}

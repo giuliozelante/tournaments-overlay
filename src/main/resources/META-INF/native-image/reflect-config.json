@@ -1,0 +1,27 @@
+[
+  {
+    "name": "java.beans.Introspector",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "getBeanInfo", "parameterTypes": ["java.lang.Class"]}
+    ]
+  },
+  {
+    "name": "com.sun.beans.introspect.ClassInfo",
+    "methods": [
+      {"name": "<init>", "parameterTypes": ["java.lang.Class"]}
+    ]
+  },
+  {
+    "name": "com.sun.beans.introspect.MethodInfo",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []}
+    ]
+  },
+  {
+    "name": "kotlin.coroutines.intrinsics.CoroutineSingletons",
+    "fields": [
+      {"name": "COROUTINE_SUSPENDED"}
+    ]
+  }
+] 
