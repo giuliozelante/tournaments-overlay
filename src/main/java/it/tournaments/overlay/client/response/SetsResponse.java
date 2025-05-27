@@ -36,6 +36,7 @@ public class SetsResponse {
         private Integer round;
         private Long startAt;
         private String state;
+        private String winnerId;
         private List<Slot> slots;
     }
 

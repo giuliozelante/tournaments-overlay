@@ -18,6 +18,13 @@ public class BracketSet {
     private Instant startAt;
     private String state;
     
+    // Winner information
+    private String winnerId;
+    
+    // Bracket progression
+    private String winnersNextSetId;
+    private String losersNextSetId;
+    
     private String player1Name;
     private Integer player1Score;
     private String player1Status;

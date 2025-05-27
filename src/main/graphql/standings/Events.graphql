@@ -1,15 +1,1 @@
-query Events($ownerId: ID!, $seasonStartDate: Timestamp!) {
-  tournaments(
-    query: {
-      perPage: 20 # Assuming fewer tournaments or you'll paginate this
-      filter: { ownerId: $ownerId, afterDate: $seasonStartDate }
-    }
-  ) {
-    nodes {
-      id
-      events {
-        id
-      }
-    }
-  }
-}
+query Events($ownerId:ID!,$seasonStartDate:Timestamp!){tournaments(query:{perPage:20 filter:{ownerId:$ownerId,afterDate:$seasonStartDate}}){nodes{id events{id}}}}

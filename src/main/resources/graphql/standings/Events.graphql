@@ -1,14 +1,1 @@
-query EventsQuery($tournamentId: ID!) {
-  tournament(id: $tournamentId) {
-    events {
-      id
-      name
-      slug
-      numEntrants
-      startAt
-      videogame {
-        name
-      }
-    }
-  }
-} 
+query EventsQuery($tournamentId:ID!){tournament(id:$tournamentId){events{id name slug numEntrants startAt videogame{name}}}} 

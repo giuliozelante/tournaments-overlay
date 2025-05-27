@@ -1,5 +1,6 @@
 package it.tournaments.overlay.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,10 +51,18 @@ public class BracketController {
         Map<String, List<BracketSet>> winnersRounds = groupAndSortByRound(winnersSets);
         Map<String, List<BracketSet>> losersRounds = groupAndSortByRound(losersSets);
         
+        // Create set lookup for easy access
+        Map<String, BracketSet> setLookup = createSetLookup(sets);
+        
+        // Create progression mapping for visualization
+        Map<String, List<String>> progressionMap = createProgressionMap(sets);
+        
         Map<String, Object> model = new HashMap<>();
         model.put("sets", sets);
         model.put("winnersRounds", winnersRounds);
         model.put("losersRounds", losersRounds);
+        model.put("setLookup", setLookup);
+        model.put("progressionMap", progressionMap);
         model.put("eventId", eventId);
         model.put("tournamentId", tournamentId);
         
@@ -83,6 +92,37 @@ public class BracketController {
             .forEach(entry -> rounds.put(entry.getKey(), entry.getValue()));
             
         return rounds;
+    }
+    
+    private Map<String, BracketSet> createSetLookup(List<BracketSet> sets) {
+        return sets.stream()
+            .filter(set -> set.getId() != null)
+            .collect(Collectors.toMap(
+                set -> set.getId().toString(),
+                set -> set
+            ));
+    }
+    
+    private Map<String, List<String>> createProgressionMap(List<BracketSet> sets) {
+        Map<String, List<String>> progressionMap = new HashMap<>();
+        
+        for (BracketSet set : sets) {
+            List<String> connections = new ArrayList<>();
+            
+            if (set.getWinnersNextSetId() != null && !set.getWinnersNextSetId().equals("ELIMINATED")) {
+                connections.add("W:" + set.getWinnersNextSetId());
+            }
+            
+            if (set.getLosersNextSetId() != null && !set.getLosersNextSetId().equals("ELIMINATED")) {
+                connections.add("L:" + set.getLosersNextSetId());
+            }
+            
+            if (!connections.isEmpty()) {
+                progressionMap.put(set.getId().toString(), connections);
+            }
+        }
+        
+        return progressionMap;
     }
     
     private void addEventToModel(Map<String, Object> model, Long eventId, Long tournamentId) {
